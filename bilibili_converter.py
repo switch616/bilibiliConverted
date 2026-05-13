@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 # 加载配置
 load_dotenv()
 
+
 class BilibiliCacheConverter:
     def __init__(self):
         self.cache_root = os.getenv("BILIBILI_CACHE_DIR").strip()
@@ -24,7 +25,7 @@ class BilibiliCacheConverter:
 
     def clean_name(self, name: str) -> str:
         """清理文件夹/文件名非法字符"""
-        invalid_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
+        invalid_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
         for c in invalid_chars:
             name = name.replace(c, "")
         return name.strip()
@@ -105,21 +106,25 @@ class BilibiliCacheConverter:
     def merge(self, video: str, audio: str, output: str) -> bool:
         cmd = [
             "ffmpeg",
-            "-i", video,
-            "-i", audio,
-            "-c:v", "copy",
-            "-c:a", "aac",
+            "-i",
+            video,
+            "-i",
+            audio,
+            "-c:v",
+            "copy",
+            "-c:a",
+            "aac",
             "-y",
-            output
+            output,
         ]
         try:
+            # 移除 Windows 专属参数，全平台兼容
             result = subprocess.run(
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
                 encoding="utf-8",
-                creationflags=subprocess.CREATE_NO_WINDOW
             )
             if result.returncode == 0 and os.path.exists(output):
                 return True
@@ -200,12 +205,16 @@ class BilibiliCacheConverter:
 
         print(f"找到 {len(sorted_folders)} 个视频，按BV课程分组转换...\n")
         loop = asyncio.get_event_loop()
-        tasks = [loop.run_in_executor(self.executor, self.process_folder, f) for f in sorted_folders]
+        tasks = [
+            loop.run_in_executor(self.executor, self.process_folder, f)
+            for f in sorted_folders
+        ]
         await asyncio.gather(*tasks)
         print("\n全部任务执行完成！")
 
     def start(self):
         asyncio.run(self.async_run())
+
 
 if __name__ == "__main__":
     try:
