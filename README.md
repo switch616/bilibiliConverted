@@ -67,9 +67,12 @@ pip install python-dotenv
 ```bash
 python bilibili_converter.py
 ```
+
 程序将自动完成：识别缓存 → 按课程分类 → 批量转换 → 输出 MP4
 
-转换前目录结构如 **图 2** 所示。
+B站客户端下载的每个视频会对应生成一个文件夹，文件夹内包含缓存文件、配置信息等特殊格式文件，无法直接在通用播放器播放；本工具会自动解析该目录结构，将其转换为单个标准 MP4 视频文件。
+
+如某一个视频离线缓存后，转换前文件目录结构如 **图 2** 所示。
 <center>
 <div>
   <img width="80%" src="img/2.png" alt="" />
@@ -79,7 +82,7 @@ python bilibili_converter.py
 </div>
 </center>
 
-转换前目录结构如 **图 3** 所示。
+转换后目录结构如 **图 3** 所示。
 
 <center>
 <div>
