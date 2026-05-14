@@ -42,6 +42,7 @@ class BilibiliCacheConverter:
         bvid = "UnknownBV"
         tab_name = os.path.basename(folder_path)
         group_title = "未命名课程"
+        course_link = ""
 
         for info_file in ["videoInfo.json", ".videoInfo"]:
             info_path = os.path.join(folder_path, info_file)
@@ -57,6 +58,8 @@ class BilibiliCacheConverter:
                     tab_name = data.get("tabName", data.get("title", tab_name)).strip()
                     # 课程全称
                     group_title = data.get("groupTitle", "未命名课程").strip()
+                    # 课程链接
+                    course_link = "https://www.bilibili.com/video/" + bvid
                     break
                 except:
                     continue
@@ -64,14 +67,16 @@ class BilibiliCacheConverter:
         bvid = self.clean_name(bvid)
         tab_name = self.clean_name(tab_name)
         group_title = self.clean_name(group_title)
-        return p_index, bvid, tab_name, group_title
+        course_link = course_link.strip()
+        return p_index, bvid, tab_name, group_title, course_link
 
-    def create_course_info_txt(self, course_dir, group_title):
+    def create_course_info_txt(self, course_dir, group_title, course_link):
         """在课程文件夹生成 00_课程信息.txt，保证排序第一"""
         txt_path = os.path.join(course_dir, "00_课程信息.txt")
         if not os.path.exists(txt_path):
             with open(txt_path, "w", encoding="utf-8") as f:
                 f.write(f"{group_title}\n")
+                f.write(f"课程链接：{course_link}\n")
             print(f"已生成课程说明文件：{txt_path}")
 
     def create_and_fix_temp_file(self, original_file: str):
@@ -149,14 +154,16 @@ class BilibiliCacheConverter:
         return video_file, audio_file
 
     def process_folder(self, folder_path: str):
-        p_idx, bvid, tab_name, group_title = self.parse_video_info(folder_path)
+        p_idx, bvid, tab_name, group_title, course_link = self.parse_video_info(
+            folder_path
+        )
 
         # 按BV号建课程文件夹
         course_dir = os.path.join(self.output_root, bvid)
         os.makedirs(course_dir, exist_ok=True)
 
         # 生成00_课程信息txt
-        self.create_course_info_txt(course_dir, group_title)
+        self.create_course_info_txt(course_dir, group_title, course_link)
 
         # 视频文件名直接用tabName，不再加序号前缀
         output_mp4 = os.path.join(course_dir, f"{tab_name}.mp4")
